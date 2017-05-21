@@ -1,0 +1,27 @@
+function saveData(params,q,n)
+
+persistent wasCalled
+
+    
+    if  (params.io.freq<=params.time.steps ),
+        if  (~mod(n,params.io.freq)),
+            workDir     = [getenv('WORK') '/3DNavierStokes/'  params.io.subFolder '/'] ;
+            
+            if isempty(wasCalled)
+                wasCalled = true ; 
+                [~,~] = mkdir(workDir)  ; 
+        
+            end
+
+            
+%            fNameTemplate   = [sprintf('/dump_%d', caseNumber)  '_%010d.mat' ] ; 
+            fName  = sprintf(['/dump_'  '%010d.mat'],n ) ; 
+            
+            save([workDir fName ],'q' )  
+            
+            
+        end    
+    end 
+ 
+
+end

@@ -1,0 +1,69 @@
+clear all ;  close all;  clc;
+
+global params
+% TODO
+% reibungsterme
+% nicht ref rb 
+% wall rb, mit def wärme fluss 
+% filter pipe
+% optimiren
+% rot sym 
+% gl lösen
+
+% equation 
+params.equation.nVar = 5 ; 
+params.equation.gamma = 1.4 ; 
+
+% params %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+params = parameter_pipe(params) ;
+%params = parameter_euclid(params) ;
+%params = parameter_test(params) ;
+%params = parameter_capillary(params) ;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+params      = init_geometry(params)     ; 
+params      = init_deriv(params)        ; 
+params      = init_metric(params)       ; 
+params      = init_bound(params)        ; 
+[params, q] = start_vals_euler(params)  ;   
+
+% plot %%%%%%%%%%%
+plotFreq = 50 ; 
+
+% time %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tSteps = 10000 ; 
+dx = min([params.geom.dxi, params.geom.deta, params.geom.dzeta]  );
+CFL =1e-1 ; 
+dt = CFL*dx/sqrt(params.equation.gamma*1e5/1);  
+% io %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%workDir     = [getenv('WORK') 'testPolar/' ] ; 
+%fNameTemplate   = [sprintf('/dump_%d', caseNumber)  '_%010d.mat' ] ; 
+%fNameE          = [sprintf('/dump_%d', caseNumber)  '_energy.mat' ] ; 
+
+% plotten %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if  (plotFreq<inf) , 
+    params.time.n = 0 ; 
+    plotFlow(params,q) ;  
+end 
+
+% time loop %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+for n =1:tSteps
+    n
+    %%%%
+    params.time.n = n ;
+    %%%%%%%%%%%%%% time step %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    tic
+    q = RK4(q,dt, 0, @rhs_skew_NCP ) ;  
+    toc 
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % plotten %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if  (plotFreq<=tSteps &&   ~mod(n,plotFreq)) , 
+        plotFlow(params,q) ;
+        %pause
+    end 
+    % save %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+end

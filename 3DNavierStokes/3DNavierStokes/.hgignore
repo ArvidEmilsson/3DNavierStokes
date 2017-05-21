@@ -1,0 +1,16 @@
+
+syntax: glob
+*~
+*.orig
+*.txt
+*.png
+*.jpg
+*.eps
+*.zip
+*.mat
+OBSOLET/*
+LOG/*
+figs/*
+
+config_SCoReCFD.m
+config_playItAgain.m

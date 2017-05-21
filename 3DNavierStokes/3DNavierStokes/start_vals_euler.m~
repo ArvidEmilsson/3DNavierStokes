@@ -1,0 +1,50 @@
+function [params, q ] = start_vals_euler(params) 
+
+    X = params.geom.X ;
+    Y = params.geom.Y ;
+    Z = params.geom.Z ;
+    
+    q = zeros([params.geom.n params.equation.nVar]) ; 
+    gamma = params.equation.gamma   ; 
+    Ly  = params.geom.L(2); 
+            
+    switch params.start.type 
+        case 'pulse'
+
+            x0  = params.start.x0 ;
+            y0  = params.start.y0 ;
+            z0  = params.start.z0 ;
+            
+            
+            sigX2  = params.start.sig(1)^2 ; %  (Ly/6)^2 ; 
+            sigY2  = params.start.sig(1)^2 ; % (Ly/6)^2 ; 
+            sigZ2  = params.start.sig(1)^2 ; % (Ly/12)^2 ;
+
+            a = 100 ;
+            p0      = 1e5 ;
+            %rho0    = 1   ; 
+            
+            q(:,:,:, 5) = p0+ a*exp( -(X-x0).^2/sigX2 -(Y-y0).^2/sigY2 -(Z-z0).^2/sigZ2  ) ; 
+            q(:,:,:, 1) = sqrt( (q(:,:,:, 5)/p0).^(1/gamma)  )   ;
+        case 'Tpulse'
+            x0  = params.start.x0 ;
+            y0  = params.start.y0 ;
+            z0  = params.start.z0 ;
+            
+            sigX2  = (Ly/6)^2 ; 
+            sigY2  = (Ly/6)^2 ; 
+            sigZ2  = (Ly/12)^2 ;
+
+            a = .1 ;
+            p0      = 1e5 ;
+            %rho0    = 1   ; 
+            
+            q(:,:,:, 5) = p0 ; 
+            q(:,:,:, 1) = sqrt( 1- a*exp( -(X-x0).^2/sigX2 -(Y-y0).^2/sigY2 -(Z-z0).^2/sigZ2  )   )   ;
+            
+        otherwise 
+            error('no so start type')
+    end
+    
+    %keyboard
+end
